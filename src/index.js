@@ -15,7 +15,7 @@ app.get('/', (_request, response) => {
 
 app.get('/talker', async (req, res) => {
   const response = await getAllTalkers();
-  if(!response) {
+  if (!response) {
     return res.status(400).json([]);
   }
   return res.status(200).json(response);
@@ -24,4 +24,3 @@ app.get('/talker', async (req, res) => {
 app.listen(PORT, () => {
   console.log('Online');
 });
-
