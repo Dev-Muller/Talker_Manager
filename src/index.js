@@ -1,6 +1,7 @@
 const express = require('express');
 const crypto = require('crypto');
-const { getAllTalkers, getTalkerId, readFileContent, writeFileContent } = require('./talkerUtils');
+const { getAllTalkers,
+  getTalkerId, readFileContent, writeFileContent, deleteFileContent } = require('./talkerUtils');
 const validateEmail = require('./middlewear/validateEmail');
 const validatePassword = require('./middlewear/validatePassword');
 const { validateTalkerName,
@@ -77,6 +78,16 @@ validateTalkerTalk, validateTalkerRate, validateTalkerWatchedAt, async (req, res
   });
   await writeFileContent(talkerMap);
   return res.status(200).json(editedTalker);
+});
+
+app.delete('/talker/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  try {
+    await deleteFileContent(Number(id));
+    res.status(204).end();
+  } catch (error) {
+    res.status(500).json({ error });
+  }
 });
 
 app.listen(PORT, () => {

@@ -32,4 +32,19 @@ async function writeFileContent(newTalker) {
   await fs.writeFile(path.join(__dirname, 'talker.json'), JSON.stringify(newTalker));
 }
 
-module.exports = { getAllTalkers, getTalkerId, readFileContent, writeFileContent };
+async function deleteFileContent(param) {
+  try {
+    const read = await readFileContent();
+    const remove = read.filter((p) => p.id !== param);
+    return await fs.writeFile(path.join(__dirname, 'talker.json'), JSON.stringify(remove));
+    // return remove;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+module.exports = { getAllTalkers,
+  getTalkerId,
+  readFileContent,
+  writeFileContent,
+  deleteFileContent };
