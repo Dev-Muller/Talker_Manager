@@ -1,33 +1,35 @@
 const fs = require('fs').promises;
 const path = require('path');
 
-async function getAllTalkers() {
+async function readFileContent() {
   const DefPath = 'talker.json';
-  // path.resolve(__dirname, 'src', 'talker.json')
+  const fileContent = await fs
+    .readFile(path.resolve(path.join(__dirname, DefPath)), 'utf-8');
+  
+  const talkerJSON = JSON.parse(fileContent);
+  return talkerJSON;
+}
+
+async function getAllTalkers() {
   try {
-    const fileContent = await fs
-      .readFile(path.resolve(path.join(__dirname, DefPath)), 'utf-8');
-  
-    const talker = JSON.parse(fileContent);
-  
-    return talker;
+    return await readFileContent();
   } catch (error) {
     return console.log(error);
   }
 }
 
 async function getTalkerId(id) {
-  const talkerPath = 'talker.json';
-  const fileContent = await fs
-    .readFile(path.resolve(path.join(__dirname, talkerPath)), 'utf-8');
-
-  const talkers = JSON.parse(fileContent);
-
+  const func = await readFileContent();
   try {
-    const selectTalker = talkers.find((talker) => talker.id === Number(id));
+    const selectTalker = func.find((talker) => talker.id === Number(id));
     return selectTalker;
   } catch (error) {
     return console.log(error);
   }
 }
-module.exports = { getAllTalkers, getTalkerId };
+
+async function writeFileContent(newTalker) {
+  await fs.writeFile(path.join(__dirname, 'talker.json'), JSON.stringify(newTalker));
+}
+
+module.exports = { getAllTalkers, getTalkerId, readFileContent, writeFileContent };
