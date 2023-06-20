@@ -16,4 +16,18 @@ async function getAllTalkers() {
   }
 }
 
-module.exports = { getAllTalkers };
+async function getTalkerId(id) {
+  const talkerPath = 'talker.json';
+  const fileContent = await fs
+    .readFile(path.resolve(path.join(__dirname, talkerPath)), 'utf-8');
+
+  const talkers = JSON.parse(fileContent);
+
+  try {
+    const selectTalker = talkers.find((talker) => talker.id === Number(id));
+    return selectTalker;
+  } catch (error) {
+    return console.log(error);
+  }
+}
+module.exports = { getAllTalkers, getTalkerId };
