@@ -6,8 +6,8 @@ function validatePassword(req, res, next) {
         { message: 'O campo "password" é obrigatório' },
       );
     }
-  const verify = password >= 6;
-  if (!verify) {
+
+  if (password.length < 6) {
     return res.status(400).json(
       {
         message: 'O "password" deve ter pelo menos 6 caracteres',
