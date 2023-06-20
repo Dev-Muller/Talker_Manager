@@ -1,6 +1,8 @@
 const express = require('express');
 const crypto = require('crypto');
 const { getAllTalkers, getTalkerId } = require('./talkerUtils');
+const validateEmail = require('./middlewear/validateEmail');
+const validatePassword = require('./middlewear/validatePassword');
 // const anotherRouter = require('./routes/anotherRouter');
 const app = express();
 
@@ -32,13 +34,7 @@ app.get('/talker/:id', async (req, res) => {
   return res.status(200).json(response);
 });
 
-app.post('/login', (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: 'erro123' });
-  }
-
+app.post('/login', validateEmail, validatePassword, (req, res) => {
   const token = crypto.randomBytes(8).toString('hex');
   return res.status(200).json({ token });
 });
