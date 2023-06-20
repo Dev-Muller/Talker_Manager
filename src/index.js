@@ -58,6 +58,27 @@ app.post('/talker', authenticateToken, validateTalkerName,
     return res.status(201).json(newTalker);
 });
 
+app.put('/talker/:id', authenticateToken, validateTalkerName,
+validateTalkerAge,
+validateTalkerTalk, validateTalkerRate, validateTalkerWatchedAt, async (req, res) => {
+  const { id } = req.params;
+  const talker = req.body;
+  const response = await getTalkerId(Number(id));
+  if (response === undefined) {
+    return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+  }
+  const editedTalker = { id: Number(id), ...talker };
+  const allTalkers = await getAllTalkers();
+  const talkerMap = allTalkers.map((talke) => {
+    if (talke.id === editedTalker.id) {
+      return editedTalker;
+    }
+    return talke;
+  });
+  await writeFileContent(talkerMap);
+  return res.status(200).json(editedTalker);
+});
+
 app.listen(PORT, () => {
   console.log('Online');
 });
