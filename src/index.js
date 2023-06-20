@@ -1,7 +1,9 @@
 const express = require('express');
+const crypto = require('crypto');
 const { getAllTalkers, getTalkerId } = require('./talkerUtils');
 // const anotherRouter = require('./routes/anotherRouter');
 const app = express();
+
 app.use(express.json());
 // app.use('/another', anotherRouter);
 
@@ -28,6 +30,17 @@ app.get('/talker/:id', async (req, res) => {
     return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
   }
   return res.status(200).json(response);
+});
+
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'erro123' });
+  }
+
+  const token = crypto.randomBytes(8).toString('hex');
+  return res.status(200).json({ token });
 });
 
 app.listen(PORT, () => {
