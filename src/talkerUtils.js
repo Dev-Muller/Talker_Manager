@@ -43,6 +43,11 @@ async function deleteFileContent(param) {
   }
 }
 
+// async function filterFileContent(param) {
+//   const read = await readFileContent();
+    
+// }
+
 module.exports = { getAllTalkers,
   getTalkerId,
   readFileContent,

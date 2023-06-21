@@ -1,7 +1,9 @@
 const express = require('express');
 const crypto = require('crypto');
 const { getAllTalkers,
-  getTalkerId, readFileContent, writeFileContent, deleteFileContent } = require('./talkerUtils');
+  getTalkerId,
+  readFileContent,
+  writeFileContent, deleteFileContent } = require('./talkerUtils');
 const validateEmail = require('./middlewear/validateEmail');
 const validatePassword = require('./middlewear/validatePassword');
 const { validateTalkerName,
@@ -11,6 +13,7 @@ const { validateTalkerName,
   validateTalkerWatchedAt,
 } = require('./middlewear/validateNewTalker');
 const authenticateToken = require('./middlewear/validateAuth');
+const { validateSearchTerm, validateSearchRate } = require('./middlewear/validateSearchTerm');
 // const anotherRouter = require('./routes/anotherRouter');
 const app = express();
 
@@ -31,6 +34,28 @@ app.get('/talker', async (req, res) => {
     return res.status(400).json([]);
   }
   return res.status(200).json(response);
+});
+
+app.get('/talker/search', authenticateToken,
+  validateSearchRate, validateSearchTerm, async (req, res) => {
+  const { q: searchTerm, rate } = req.query;
+
+  const read = await readFileContent();
+
+  if ((!searchTerm || searchTerm.trim() === '') && !rate) {
+    return res.status(200).json(read);
+  }
+  const filteredTalkers = read.filter((talker) => {
+    //   talker.name.toLowerCase().includes(searchTerm.toLowerCase());
+    // read.filter((talker) => talker.talk.rate === rate);
+    const matchesSearchTerm = searchTerm
+        ? talker.name.toLowerCase().includes(searchTerm.toLowerCase())
+        : true;
+    const matchesRate = req.query.rate ? talker.talk.rate === rate : true;
+    return matchesSearchTerm && matchesRate;
+  });
+
+  return res.status(200).json(filteredTalkers);
 });
 
 app.get('/talker/:id', async (req, res) => {
