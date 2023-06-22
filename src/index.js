@@ -42,16 +42,11 @@ app.get('/talker/search', authenticateToken,
 
   const read = await readFileContent();
 
-  if ((!searchTerm || searchTerm.trim() === '') && !rate) {
-    return res.status(200).json(read);
-  }
   const filteredTalkers = read.filter((talker) => {
-    //   talker.name.toLowerCase().includes(searchTerm.toLowerCase());
-    // read.filter((talker) => talker.talk.rate === rate);
     const matchesSearchTerm = searchTerm
         ? talker.name.toLowerCase().includes(searchTerm.toLowerCase())
         : true;
-    const matchesRate = req.query.rate ? talker.talk.rate === rate : true;
+    const matchesRate = req.query.rate ? talker.talk.rate === +rate : true;
     return matchesSearchTerm && matchesRate;
   });
 
