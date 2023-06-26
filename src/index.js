@@ -13,7 +13,8 @@ const { validateTalkerName,
   validateTalkerWatchedAt,
 } = require('./middlewear/validateNewTalker');
 const authenticateToken = require('./middlewear/validateAuth');
-const { validateSearchTerm, validateSearchRate } = require('./middlewear/validateSearchTerm');
+const { validateSearchTerm,
+  validateSearchRate, validateSearchWatchAt } = require('./middlewear/validateSearchTerm');
 // const anotherRouter = require('./routes/anotherRouter');
 const app = express();
 
@@ -37,8 +38,8 @@ app.get('/talker', async (req, res) => {
 });
 
 app.get('/talker/search', authenticateToken,
-  validateSearchRate, validateSearchTerm, async (req, res) => {
-  const { q: searchTerm, rate } = req.query;
+  validateSearchRate, validateSearchTerm, validateSearchWatchAt, async (req, res) => {
+  const { q: searchTerm, rate, date } = req.query;
 
   const read = await readFileContent();
 
@@ -47,7 +48,8 @@ app.get('/talker/search', authenticateToken,
         ? talker.name.toLowerCase().includes(searchTerm.toLowerCase())
         : true;
     const matchesRate = req.query.rate ? talker.talk.rate === +rate : true;
-    return matchesSearchTerm && matchesRate;
+    const watchedAtSearch = talker.talk.watchedAt === date;
+    return matchesSearchTerm && matchesRate && watchedAtSearch;
   });
 
   return res.status(200).json(filteredTalkers);
