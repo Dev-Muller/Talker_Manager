@@ -15,11 +15,11 @@ const { validateTalkerName,
 const authenticateToken = require('./middlewear/validateAuth');
 const { validateSearchTerm,
   validateSearchRate, validateSearchWatchAt } = require('./middlewear/validateSearchTerm');
-// const anotherRouter = require('./routes/anotherRouter');
+const { validateRateId } = require('./middlewear/validateRate');
+
 const app = express();
 
 app.use(express.json());
-// app.use('/another', anotherRouter);
 
 const HTTP_OK_STATUS = 200;
 const PORT = process.env.PORT || '3001';
@@ -110,6 +110,19 @@ app.delete('/talker/:id', authenticateToken, async (req, res) => {
   } catch (error) {
     res.status(500).json({ error });
   }
+});
+
+app.patch('/talker/rate/:id', authenticateToken, validateRateId, async (req, res) => {
+  const { id } = req.params;
+  const { rate } = req.body;
+
+  const talker = await readFileContent();
+  const talkerId = talker.find((s) => s.id === +id);
+  
+  talkerId.talk.rate = rate;
+  await writeFileContent(talker);
+  
+  return res.status(204).end();
 });
 
 app.listen(PORT, () => {
