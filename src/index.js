@@ -52,17 +52,20 @@ app.get('/talker/search', authenticateToken,
   const { q: searchTerm, rate, date } = req.query;
 
   const read = await readFileContent();
-
-  const filteredTalkers = read.filter((talker) => {
-    const matchesSearchTerm = searchTerm
-        ? talker.name.toLowerCase().includes(searchTerm.toLowerCase())
-        : true;
-    const matchesRate = req.query.rate ? talker.talk.rate === +rate : true;
-    const watchedAtSearch = talker.talk.watchedAt === date;
-    return matchesSearchTerm && matchesRate && watchedAtSearch;
-  });
-
-  return res.status(200).json(filteredTalkers);
+  let matchesSearchTerm = read;
+  if (searchTerm) {
+    matchesSearchTerm = matchesSearchTerm
+      .filter((search) => search.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  }
+  if (rate) {
+    matchesSearchTerm = matchesSearchTerm
+      .filter((search) => search.talk.rate === +rate);
+  }
+  if (date) {
+    matchesSearchTerm = matchesSearchTerm
+      .filter((search) => search.talk.watchedAt === date);
+  }
+  return res.status(200).json(matchesSearchTerm);
 });
 
 app.get('/talker/db', (_req, res) => {

@@ -8,30 +8,31 @@ async function validateSearchTerm(req, res, next) {
   if ((!searchTerm || searchTerm.trim() === '') && !rate && watchedAt) {
     return res.status(200).json(read);
   }
-
+  
   next();
 }
 
 function validateSearchRate(req, res, next) {
   const { rate } = req.query;
-
+  
   if (rate && (!Number.isInteger(+rate) || +rate < 1 || +rate > 5)) {
     return res.status(400)
-      .json({ message: 'O campo "rate" deve ser um número inteiro entre 1 e 5' });
+    .json({ message: 'O campo "rate" deve ser um número inteiro entre 1 e 5' });
   }
   next();
 }
 
 async function validateSearchWatchAt(req, res, next) {
   const { date } = req.query;
-
-  const read = await readFileContent();
-  if (date === '' || !date) {
-    return res.status(200).json(read);
-  }
+  
+  // const read = await readFileContent();
+  // if (!date) {
+  //   console.log('date');
+  //   return res.status(200).json(read);
+  // }
 
   const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
-  if (!dateRegex.test(date)) {
+  if (!dateRegex.test(date) && date) {
     return res.status(400).json({ message: 'O parâmetro "date" deve ter o formato "dd/mm/aaaa"' });
   }
 
