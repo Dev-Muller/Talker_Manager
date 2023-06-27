@@ -1,5 +1,6 @@
 const express = require('express');
 const crypto = require('crypto');
+const mysql = require('mysql2');
 const { getAllTalkers,
   getTalkerId,
   readFileContent,
@@ -20,6 +21,15 @@ const { validateRateId } = require('./middlewear/validateRate');
 const app = express();
 
 app.use(express.json());
+
+// mysql.createPool qual a diferença para o createConnection?
+const connection = mysql.createPool({
+  host: process.env.MYSQL_HOSTNAME,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+  port: process.env.MYSQL_PORT,
+});
 
 const HTTP_OK_STATUS = 200;
 const PORT = process.env.PORT || '3001';
@@ -53,6 +63,24 @@ app.get('/talker/search', authenticateToken,
   });
 
   return res.status(200).json(filteredTalkers);
+});
+
+app.get('/talker/db', (_req, res) => {
+  connection.query('SELECT * FROM talkers', (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: 'Erro ao consultar o banco de dados' });
+    }
+    const talkers = results.map((result) => ({
+      id: result.id,
+      name: result.name,
+      age: result.age,
+      talk: {
+        watchedAt: result.talk_watched_at,
+        rate: result.talk_rate,
+      }, 
+    }));
+    res.status(200).json(talkers);
+  });
 });
 
 app.get('/talker/:id', async (req, res) => {
